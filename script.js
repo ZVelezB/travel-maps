@@ -2,7 +2,7 @@
 function initMap() {
     tt.setProductInfo('Map Repo Site', '1.0');
     const map = tt.map({
-        key: 'jvqsCjPo76SDmG4NETSyRSFEe6B4pNXV',  // Replace with your TomTom API key
+        key: 'YOUR_TOMTOM_API_KEY',  // Replace with your TomTom API key
         container: 'map',
         center: [-68.15, -16.5],     // La Paz, Bolivia (longitude, latitude)
         zoom: 12
@@ -13,8 +13,9 @@ function initMap() {
 
 // Calculate Average Coordinates
 function calculateAverage(coords) {
-    const avgLat = coords.reduce((sum, p) => sum + p.Latitude, 0) / coords.length;
-    const avgLon = coords.reduce((sum, p) => sum + p.Longitude, 0) / coords.length;
+    const validCoords = coords.filter(p => !isNaN(p.Latitude) && !isNaN(p.Longitude));
+    const avgLat = validCoords.reduce((sum, p) => sum + p.Latitude, 0) / validCoords.length;
+    const avgLon = validCoords.reduce((sum, p) => sum + p.Longitude, 0) / validCoords.length;
     return { Latitude: avgLat, Longitude: avgLon };
 }
 
@@ -27,20 +28,26 @@ function handleCSVUpload(map) {
                 header: true,
                 skipEmptyLines: true,
                 complete: function (results) {
-                    const data = results.data;
+                    const data = results.data.map(point => ({
+                        Latitude: parseFloat(point.Latitude.trim()),
+                        Longitude: parseFloat(point.Longitude.trim())
+                    })).filter(p => !isNaN(p.Latitude) && !isNaN(p.Longitude));
+
                     data.forEach(point => {
-                        if (point.Latitude && point.Longitude) {
-                            new tt.Marker(rotation=20).setLngLat([parseFloat(point.Longitude), parseFloat(point.Latitude)]).addTo(map);
-                        }
+                        new tt.Marker().setLngLat([point.Longitude, point.Latitude]).addTo(map);
                     });
 
                     // Display Metrics
-                    const avg = calculateAverage(data);
-                    document.getElementById('metrics').innerHTML = `
-                        Total Points: ${data.length}<br>
-                        Average Latitude: ${avg.Latitude.toFixed(5)}<br>
-                        Average Longitude: ${avg.Longitude.toFixed(5)}
-                    `;
+                    if (data.length > 0) {
+                        const avg = calculateAverage(data);
+                        document.getElementById('metrics').innerHTML = `
+                            Total Points: ${data.length}<br>
+                            Average Latitude: ${avg.Latitude.toFixed(3)}<br>
+                            Average Longitude: ${avg.Longitude.toFixed(3)}
+                        `;
+                    } else {
+                        document.getElementById('metrics').innerHTML = "No valid coordinates found.";
+                    }
                 }
             });
         }
