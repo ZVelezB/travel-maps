@@ -30,7 +30,7 @@ function handleCSVUpload(map) {
                     const data = results.data;
                     data.forEach(point => {
                         if (point.Latitude && point.Longitude) {
-                            new tt.Marker().setLngLat([parseFloat(point.Longitude), parseFloat(point.Latitude)]).addTo(map);
+                            new tt.Marker(rotation=20).setLngLat([parseFloat(point.Longitude), parseFloat(point.Latitude)]).addTo(map);
                         }
                     });
 
