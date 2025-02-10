@@ -2,7 +2,7 @@
 function initMap() {
     tt.setProductInfo('Map Repo Site', '1.0');
     const map = tt.map({
-        key: 'YOUR_TOMTOM_API_KEY',  // Replace with your TomTom API key
+        key: 'jvqsCjPo76SDmG4NETSyRSFEe6B4pNXV',  // Replace with your TomTom API key
         container: 'map',
         center: [-68.15, -16.5],     // La Paz, Bolivia (longitude, latitude)
         zoom: 12
